@@ -1,0 +1,224 @@
+{% extends 'master.html' %}
+
+{% block body %}
+{% for msg in messages %}
+<div class="alert alert-{{msg.tags}}" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+    <strong>{{msg.tags}}</strong> {{msg.message}}
+</div>
+{% endfor %}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header pb-0">
+                <h3 class="mb-0 card-title">Search Audit Data by Date </h3>
+                <div class="col-md-8">
+                    <span style="background-color: #fb7c7c; padding: 10px;">Not Matched</span>
+                    <span style="background-color: #dbdb49; padding: 10px;">parcialy matched</span>
+                    <span style="background-color: #9cf576; padding: 10px;">fully matched</span>
+                    <span style="background-color: lightblue; padding: 10px;">only amount matched</span>
+                </div>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group has-success">
+                                <label for="">Audit Date</label>
+                                <input type="date" value="{{audit_date}}" class="form-control is-valid state-valid" name="searchDate" placeholder="Valid Email..">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="">Audit Type</label>
+                                <select name="fileType" id="" class="form-control">
+                                    <option value="2" {% if auditType == '2' %} selected {% endif %}>Select Audit Type</option>
+                                    <option value="0" {% if auditType == '0' %} selected {% endif %}>Withdrawal</option>
+                                    <option value="1" {% if auditType == '1' %} selected {% endif %}>Deposit</option>
+                                </select>
+                            </div>                       
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row custom-controls-stacked">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for=""> Amount </label> <br>
+                                       <label class="custom-switch">
+                                           <input type="checkbox" class="custom-switch-input" name="amount_box" value="True" {% if "amount_box" in posted_data %} checked="true" {% endif %}>
+                                           <span class="custom-switch-indicator"></span>
+                                           <span class="custom-switch-description">Match by amount</span>
+                                       </label>
+                                   </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for=""> Name </label> <br>
+                                       <label class="custom-switch">
+                                           <input type="checkbox" class="custom-switch-input" name="name_box" value="True" {% if "name_box" in posted_data %} checked="true" {% endif %}>
+                                           <span class="custom-switch-indicator"></span>
+                                           <span class="custom-switch-description">Match by name</span>
+                                       </label>
+                                   </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <label for=""> Date </label> <br>
+                                       <label class="custom-switch">
+                                           <input type="checkbox" class="custom-switch-input" id="date_box" name="date_box" value="True" {% if "date_box" in posted_data %} checked="true" {% endif %}>
+                                           <span class="custom-switch-indicator"></span>
+                                           <span class="custom-switch-description">Match by date</span>
+                                       </label>
+                                   </div>                                 
+                                </div>                                
+                            </div>
+                            <div class="row my-4" id="audit_date"  {% if "date_box" in posted_data %} style="display: flex;" {% else %} style="display: none;"  {% endif %}>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="">Select date for match</label>
+                                        <input type="date" name="audit_date" class="form-control" {% if "date_box" in posted_data %} value="{{posted_data.audit_date}}"  {% endif %}>
+                                    </div>
+                                </div>
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for=""> Between Match with above given date </label>
+                                        <label class="custom-switch">
+                                            <input type="checkbox" name="audit_date_type" class="custom-switch-input audit_date_type" {% if "audit_date_type" in posted_data %} checked="checked"  {% endif %}>
+                                            <span class="custom-switch-indicator"></span>
+                                            <span class="custom-switch-description">Please turn on and give the days between from the selected date</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <span {% if "audit_date_type" in posted_data %} style="display: contents;" {% else %} style="display: none;"  {% endif %} class="days_between">
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="">Days before</label>
+                                            <input type="number" name="days_before" {% if "days_before" in posted_data %} value="{{posted_data.days_before}}" {% else %} value="1" {% endif %} class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <label for="">Days After</label>
+                                            <input type="number" name="days_after" {% if "days_after" in posted_data %} value="{{posted_data.days_after}}" {% else %} value="1" {% endif %} class="form-control">
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="col-12">
+                            <input class="btn btn-primary" type="submit">
+                             
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+
+
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header pb-0">
+                <div class="card-title">Bank Statement of ({{audit_date}})</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="vertical-scrollable-datatable" class="table table-striped table-bordered text-nowrap" >
+                        <thead>
+                            <tr>
+                                <th>ID</th> 
+                                <th>Tracking ID</th>
+                                <th>amount</th> 
+                                <th>customar</th> 
+                                <!-- <th>Status</th> -->
+                                <th>Date</th> 
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bankData in bankStatementData %}
+                            <tr style="background-color: {{bankData.color}};">
+                                <td> {{bankData.ID}} </td>
+                                <td> {{bankData.matched_id}} </td>
+                                <td> {{bankData.amount}} </td>
+                                <td> {{bankData.customar}} </td>
+                                <!-- <td> {{bankData.status}} </td> -->
+                                <td> {{bankData.request_date}} </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header pb-0">
+                <div class="card-title">{{auditTypeHeading}} Rquests of ({{audit_date}})</div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="vertical-scrollable-datatable2" class="table table-striped table-bordered text-nowrap" >
+                        <thead>
+                            <tr>
+                                <th>ID</th> 
+                                <th>Tracking ID</th>
+                                <th>amount</th> 
+                                <th>customar</th> 
+                                <!-- <th>Status</th> -->
+                                <th>Date</th> 
+                             </tr>
+                        </thead>
+                        <tbody>
+                            {% for bankData in auditRequestData %}
+                                <tr style="background-color: {{bankData.color}};">
+                                    <td> {{bankData.ID}} </td>
+                                    <td> {{bankData.matched_id}} </td>
+                                    <td> {{bankData.amount}} </td>
+                                    <td> {{bankData.customar}} </td>
+                                    <!-- <td> {{bankData.status}} </td> -->
+                                    <td> {{bankData.request_date}} </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+</div>
+{% endblock %}
+{% block js %}
+<script> 
+    $(document).ready(function(){
+        $('#date_box').change(function(){
+            if($(this).is(":checked")){
+                $('#audit_date').css("display", "flex")
+                $('input[name="audit_date"]').prop("required", true)
+            }else{
+                $('#audit_date').css("display", "none")  
+                $('input[name="audit_date"]').prop("required", false)              
+            }
+        });
+
+        $('.audit_date_type').change(function(){
+            if($(this).is(":checked")){
+                $('.days_between').css("display", "contents")
+                $('input[name="days_before"]').prop("required", true)
+                $('input[name="days_after"]').prop("required", true)
+            }else{
+                $('.days_between').css("display", "none")
+                $('input[name="days_before"]').prop("required", false)
+                $('input[name="days_after"]').prop("required", false)           
+            }
+        })
+    })
+</script>
+{% endblock %}

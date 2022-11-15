@@ -1,0 +1,121 @@
+{% extends 'master.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="#">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Users</li>
+{% endblock %}
+{% block body %}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header pb-0">
+                <h3 class="mb-0 card-title">Create New Users Record</h3>
+            </div>
+            <div class="card-body">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger">
+                                    {{form.errors}}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.username|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.email|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.password|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.contact|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.groups|as_crispy_field}}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                {{form.is_active|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.address|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header pb-0">
+                <h3 class="mb-0 card-title">Users List</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="fileexport-datatable" class="table table-bordered key-buttons text-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="20%">User Name</th>
+                                <th width="15%">Email</th>
+                                <th width="35%">Contact</th>
+                                <th width="35%">Groups</th>
+                                <th width="35%">Status</th>
+                                <th width="20%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{user.username}}</td>
+                                <td>{{user.email}}</td>
+                                <td>{{user.contact}}</td>
+                                <td>
+                                    {% for group in user.groups.all %}
+                                        {{group}} / 
+                                    {% endfor %}
+                                </td>
+                                <td>{{user.is_active}}</td>
+                                <td>
+                                    <a href="{% url 'users:UserUpdateView' pk=user.pk %}" class="btn btn-outline-success"> <i class="fa fa-edit"></i> Edit</a>
+                                    <a href="" class="btn btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+     
+    </div>
+</div>
+
+{% endblock %}

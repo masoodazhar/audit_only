@@ -1,0 +1,79 @@
+{% extends 'master.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="#">Home</a></li>
+<li class="breadcrumb-item active" aria-current="page">Roles & Authorization</li>
+{% endblock %}
+{% block body %}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header pb-0">
+                <h3 class="mb-0 card-title">Manage Roles & Authorization Record</h3>
+            </div>
+            <div class="card-body">
+                <form action="" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.name|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                {{form.permissions|as_crispy_field}}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <input type="submit" class="btn btn-primary">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header pb-0">
+                <h3 class="mb-0 card-title">Roles & Authorization List</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="fileexport-datatable" class="table table-bordered key-buttons text-nowrap">
+                        <thead>
+                            <tr>
+                                <th width="20%">Role Name</th>
+                                <th width="60%">Authorization List</th>
+                                <th width="20%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for role in RolesAuths %}
+                            <tr>
+                                <td>{{role.name}}</td>
+                                <td>
+                                    {% for perm in role.permissions.all %}
+                                        <p>{{forloop.counter}}) {{perm}}</p>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <a href="{% url 'users:RolesAuthUpdateView' pk=role.pk %}" class="btn btn-outline-success"> <i class="fa fa-edit"></i> Edit</a>
+                                    <a href="" class="btn btn-outline-danger"><i class="fa fa-trash" aria-hidden="true"></i> Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+     
+    </div>
+</div>
+
+{% endblock %}

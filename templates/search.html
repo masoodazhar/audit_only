@@ -1,0 +1,189 @@
+{% extends 'master.html' %}
+{% block style %}
+<style>
+    
+.container, .container-fluid {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+    width: 100%;
+}
+</style>
+{% endblock %}
+{% block body %}
+<section id="html5" class="container-fluid">
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header">
+					<form action="" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-5">
+                                <div class="form-group">
+                                    <label for="name" class="control-label">Bank Statement: </label>
+                                    <div class="col-md-8">
+                                        <input type="date" value="{{audit_date}}" name="searchDate" id="searchDate" required="True" class="form-control">
+                                    </div>                    
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name" class="control-label">Select Audit Type: </label>
+                                    <div class="col-md-8">
+                                        <select name="fileType" required="True" class="form-control">
+                                            <option value="2" {% if auditType == '2' %} selected {% endif %}>Select Audit Type</option>
+                                            <option value="0" {% if auditType == '0' %} selected {% endif %}>Withdrawal</option>
+                                            <option value="1" {% if auditType == '1' %} selected {% endif %}>Deposit</option>
+                                        </select>
+                                    </div>                    
+                                </div>
+                            </div>
+                            <div class="col-2 float-left">
+                                <div class="form-group">   
+                                    <label for="">.</label>                 
+                                    <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                                         <button class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span> Search </button>
+                                    </div> 
+                                </div>                            
+                            </div>
+                            
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="amount">Amount</label>
+                                    <input type="checkbox" name="columns" checked value="amount" id="amount">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="customer">customer</label>
+                                    <input type="checkbox" name="columns" checked value="customer" id="customer">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="date">Date</label>
+                                    <input type="checkbox" name="columns" value="date" id="date">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="trackingid">Tracking ID</label>
+                                    <input type="checkbox" name="columns" value="trackingid" id="trackingid">
+                                </div>
+                            </div>
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label for="trackingid">.</label>
+                                    <a href="" class="btn btn-primary">Export</a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+
+                    </form> 
+                    
+                    {{withdrawalData}}
+                    {% if messages %}
+                    <ul class="messages">
+                            {% for message in messages %}
+                            <li {% if message.tags %} class="text-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                    </ul>
+                    {% endif %}                    
+                   
+				</div>
+				
+			</div>
+		</div>
+	</div>
+    <div class="container-fluid" style="background-color: white;">
+        <div class="row">
+            <div class="col-6">
+                <div class="card-content collapse show">
+                    <div class="card-body card-dashboard">
+                        <table class="table table-striped table-bordered dataex-html5-export">
+                            <thead>
+                                 <tr>
+                                    <th>ID</th> 
+                                    <th>amount</th> 
+                                    <th>customar</th> 
+                                    <th>Date</th> 
+                                    <th>Status</th>
+                                    <th>Tracking ID</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for bankData in bankStatementData %}
+                                <tr>
+                                    <td> {{bankData.ID}} </td>
+                                    <td> {{bankData.amount}} </td>
+                                    <td> {{bankData.customar}} </td>
+                                    <td> {{bankData.request_date}} </td>
+                                    <td> {{bankData.status}} </td>
+                                    <td> {{bankData.matched_id}} </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>ID</th> 
+                                    <th>amount</th> 
+                                    <th>customar</th> 
+                                    <th>Date</th> 
+                                    <th>Status</th>
+                                    <th>Tracking ID</th>
+                                </tr>
+                            </tfoot>
+                        </table>				
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="card-content collapse show">
+                    <div class="card-body card-dashboard">
+                        <table class="table table-striped table-bordered dataex-html5-export">
+                            <thead>
+                                <tr>
+                                    <th>ID</th> 
+                                    <th>amount</th> 
+                                    <th>customar</th> 
+                                    <th>Date</th> 
+                                    <th>Status</th>
+                                    <th>Tracking ID</th>
+                                 </tr>
+                            </thead>
+                            <tbody>
+                                {% for bankData in auditRequestData %}
+                                    <tr>
+                                        <td> {{bankData.ID}} </td>
+                                        <td> {{bankData.amount}} </td>
+                                        <td> {{bankData.customar}} </td>
+                                        <td> {{bankData.request_date}} </td>
+                                        <td> {{bankData.status}} </td>
+                                        <td> {{bankData.matched_id}} </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th>ID</th> 
+                                    <th>amount</th> 
+                                    <th>customar</th> 
+                                    <th>Date</th> 
+                                    <th>Status</th>
+                                    <th>Tracking ID</th>
+                                 </tr>
+                            </tfoot>
+                        </table>				
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

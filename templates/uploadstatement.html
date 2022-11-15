@@ -1,0 +1,382 @@
+{% extends 'master.html' %}
+{% load custom_template_tags %}
+{% block content %}
+
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-8 offset-2">
+           <div class="card">
+                <div class="card-header">
+                    Upload CSV files
+                </div>
+                <div class="card-body">
+                    <form action="{% url 'uploadstatement' %}" method="POST" enctype="multipart/form-data" class="form-horizontal"> 
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name" class="control-label">Bank Statement: </label>
+                                    <div class="col-md-8">
+                                        <input type="file" name="bankstatement" id="bankstatement" required="True" class="form-control">
+                                    </div>                    
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name" class="control-label">Audit File: </label>
+                                    <div class="col-md-8">
+                                        <input type="file" name="auditFile" id="auditFile" required="True" class="form-control">
+                                    </div>                    
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="form-group">
+                                    <label for="name" class="control-label">Select Audit Type: </label>
+                                    <div class="col-md-8">
+                                        <select name="fileType" required="True" class="form-control">
+                                            <option value="2">Select Audit Type</option>
+                                            <option value="0">Withdrawal</option>
+                                            <option value="1">Deposit</option>
+                                        </select>
+                                    </div>                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">                    
+                            <div class="col-md-3 col-sm-3 col-xs-12 col-md-offset-3" style="margin-bottom:10px;">
+                                 <button class="btn btn-primary"> <span class="glyphicon glyphicon-upload" style="margin-right:5px;"></span>Upload </button>
+                            </div> 
+                        </div>
+                    </form> 
+                    {{headers}}
+                    {{withdrawalData}}
+                    {% if messages %}
+                    <ul class="messages">
+                            {% for message in messages %}
+                            <li {% if message.tags %} class="text-{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+           </div>         
+        </div>
+    </div>
+</div>
+<hr>
+{% if status %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2> Bank Statement </h2>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                {% for header in bankHeaders %}
+                                    <th>
+                                        <div class="form-group">
+                                            <label for="bank_{{header}}">{{header}}</label>
+                                            <input type="checkbox" value="{{header}}" class="bank_{{header}} bankClass" id="bank_{{header}}">
+                                        </div> 
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody id="bankTbody">
+                            {% for data in bankDataDict %}
+                                <tr>
+                                    {% for head in bankHeaders %}
+                                        <td class="{{head}}">{{data|get_value_from:head}}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>{{audit_type}} <button id="compareButton">Audit Now</button> </h2>
+                </div>
+                <div class="card-body">
+                    <table class="table" id="audit_table">
+                        <thead>
+                            {% for header in auditHeaders %}
+                                <th>
+                                    <div class="form-group">
+                                        <label for="audit_{{header}}">{{header}}</label>
+                                        <input type="checkbox" value="{{header}}" class="audit_{{header}} auditClass" id="audit_{{header}}">
+                                    </div> 
+                                </th>
+                            {% endfor %}
+                        </thead>
+                        <tbody id="auditTbody">
+                            {% for data in auditDataDict %}
+                                <tr>
+                                    {% for head in auditHeaders %}
+                                        <td class="{{head}}">{{data|get_value_from:head}}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+
+        
+
+        if("{{status}}"){
+            const compareButton = document.getElementById("compareButton")
+            compareButton.addEventListener("click", ()=>{
+                check()
+            })
+
+
+            var targetColumns = []
+            const bankTableHeading = document.getElementsByClassName("bankClass");            
+            for(var bank of bankTableHeading){
+                bank.addEventListener("change", (e)=>{
+                    var bankColumnName = e.target.value;
+
+                    if (!targetColumns.includes(bankColumnName)){
+                        targetColumns.push(bankColumnName)
+                    }else{
+                        const index = targetColumns.indexOf(bankColumnName);
+                        targetColumns.splice(index, 1)
+                    }
+                    // check(targetColumns)
+                })
+            }
+
+            var currentColumns = []
+            
+            const auditTableHeading = document.getElementsByClassName("auditClass");            
+            for(var audit of auditTableHeading){
+                
+                audit.addEventListener("change", (e)=>{
+                    var auditColumnName = e.target.value;
+
+                    if (!currentColumns.includes(auditColumnName)){
+                        currentColumns.push(auditColumnName)
+                    }else{
+                        const index = currentColumns.indexOf(auditColumnName);
+                        currentColumns.splice(index, 1)
+                    }
+                    lastLogic(currentColumns)
+                })
+            }
+
+            function lastLogic(auditColumns){
+                var table = document.getElementById('bankTbody');
+                var bankRows = table.getElementsByTagName('tr');  
+                finalMatched = []
+
+                var selectedColumnsAudit = []
+                auditColumns.forEach((itemName, i)=>{
+                    var auditTable = document.getElementById("auditTbody")
+                    var auditRows = auditTable.getElementsByTagName("tr")
+                    for (var i=0; i<auditRows.length; i++) {
+                        
+                        var atds = auditRows[i].getElementsByTagName('td');
+                        var btds = bankRows[i].getElementsByTagName('td');
+                        matchCount = 0
+                        for(var btd of btds){
+                            for( atd of atds){
+                                if(auditColumns.includes(atd.getAttribute("class"))){
+                                    var adtValue = atd.innerText
+                                    var bdtValue = btd.innerText
+                                    var splitted_name = ""
+                                    splittedIsTrue=false
+                                    if(isNaN(adtValue) && isNaN()){
+                                        var asplitted_name = adtValue.split(" ")  
+                                        var bsplitted_name = bdtValue.split(" ")  
+                                        for(var spname of asplitted_name){
+                                            if(bsplitted_name.includes(spname)){
+                                                splittedIsTrue = true
+                                            }
+                                        }
+                                    }
+
+                                    if((adtValue == bdtValue) || splittedIsTrue){
+                                        matchCount++;
+                                        
+                                        if(matchCount == auditColumns.length){
+                                            // console.log('iiiifffff=========================',bankRows[i]);
+                                            bankRows[i].classList.add('bg-success')
+                                            bankRows[i].classList.add('text-white')
+                                            finalMatched.push(adtValue)
+
+                                        }else{
+                                            // console.log('eeeeellllsssseee==================',bankRows[i]);
+                                            bankRows[i].classList.remove('bg-success')
+                                            bankRows[i].classList.remove('text-white')
+                                        }
+
+                                    }
+                                    
+                                }
+                            }
+                        }                        
+                    }
+                })
+
+                console.log(finalMatched);
+                
+                
+           
+                // console.table(finalMatched);
+                // for(var f=0; f<RowsColumns.length; f++){
+                    // console.log(RowsColumns[f][0]);
+                    // for ( var val of rows){
+                    //     var needToFindValue = val.innerText
+                        
+                        // for (var i=0, length = bankRows.length; i<length; i++) {
+                        //     matches = 0
+                        //     var tds = bankRows[i].getElementsByTagName('td');
+                        //     for(var td of tds){
+                        //         targetValue = td.innerText
+                        //         if(targetValue == needToFindValue){
+                        //             // console.log(`target = ${targetValue},   find = ${needToFindValue}`);
+                        //             finalMatched.push(
+                        //                 [targetValue, val]
+                        //             ) 
+                        //         }
+                        //     }
+                        // }
+                    // }
+                // }
+
+                
+
+                
+            }
+
+
+            function check(){
+                // console.log("======items=====", item);
+                // console.log("======items=====", targetColumns);
+
+                if(targetColumns.length == currentColumns.length){
+
+                }else{
+                    alert("Please select same columns from both tables")
+                    return;
+                }
+
+                var selectedColumnsBank = new Map();
+                var selectedColumnsAudit = new Map();
+                targetColumns.forEach((itemName, i)=>{
+                    var checks = document.getElementById("bankTbody")
+                    // console.log();
+                    selectedColumnsBank.set(itemName, checks.getElementsByClassName(itemName))
+                })
+                currentColumns.forEach((itemName, i)=>{
+                    var checks = document.getElementById("auditTbody")
+                    // console.log();
+                    selectedColumnsAudit.set(itemName, checks.getElementsByClassName(itemName))
+                })
+
+                selectedColumnsBank.forEach((columnRows, columnName) => {   
+                    
+
+                    
+                    // if item.includes(keyName)
+                    // console.log(columnList);
+                    // for(var d of columnList){
+                    //     if(Number.isNaN()){ 
+                    //         // string here
+
+                    //     }else{
+                    //         // number here
+
+                    //     }
+                    //     // if(parseInt(d.innerText) < 30000){
+                    //         // console.log('====', d.innerText);
+                    //         // d.classList.add('error')
+                    //     // }
+                    // }
+                })
+                
+                compare(selectedColumnsBank, selectedColumnsAudit)
+            }
+
+
+            function compare(table1, table2){
+                
+                bankKeys = table1.keys()
+                
+                for(var key of bankKeys){
+                    a = table2.get(key)
+                    b = table1.get(key)
+                }
+                // table2.forEach((aColumnRows, aColumnName) => {
+
+                    // table1.forEach((bColumnRows, bColumnName) => {
+                    //     i = 0
+                    //     for(var aRow of aColumnRows){
+                    //         aColVal = aRow.innerText
+                    //         bColVal = bColumnRows[i]
+                    //         if(Number.isNaN(auditValues) && Number(bankValue)){ 
+                    //             // String Here
+
+                    //         }else{
+                    //             // Integer Here
+
+                    //         }
+                    //         i++;
+                    //     }
+                    // });
+
+
+                    
+                    // ===========================1st logic START
+                    // i = 0
+                    // for (var aRows of table2.get(columnName)){
+                    //     auditValues = aRows.innerText
+                    //     bankValue = columnRows[i].innerText
+                    //     if(Number.isNaN(auditValues) && Number(bankValue)){ 
+                    //         // String Here
+                    //     }else{
+                    //         if(auditValues == bankValue){
+                    //             console.log(auditValues, '=========', bankValue);
+                    //             aRows.classList.remove("error")
+                    //             columnRows[i].classList.remove("error")
+                    //             aRows.classList.add("text-success")
+                    //             columnRows[i].classList.add("text-success")
+                    //         }else{
+                    //             aRows.classList.add("error")
+                    //             columnRows[i].classList.add("error")
+                    //             aRows.classList.remove("text-success")
+                    //             columnRows[i].classList.remove("text-success")
+                    //         }
+                    //         // number here
+
+                    //     }
+
+                    //     i++;
+                    // }
+                    // ===========================1st logic END
+                   
+                // });
+
+            }
+        }
+    
+</script>
+{% endblock %}

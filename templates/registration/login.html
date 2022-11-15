@@ -1,0 +1,156 @@
+{% load static %}
+<!doctype html>
+<html lang="en" dir="ltr">
+	
+<!-- Mirrored from laravel.spruko.com/sparic/ltr/login by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 31 Aug 2022 14:39:01 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=UTF-8" /><!-- /Added by HTTrack -->
+<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta content="Sparic– Creative Admin Multipurpose Responsive Bootstrap4 Dashboard HTML Template" name="description">
+		<meta content="Spruko Technologies Private Limited" name="author">
+		<meta name="keywords" content="html admin template, bootstrap admin template premium, premium responsive admin template, admin dashboard template bootstrap, bootstrap simple admin template premium, web admin template, bootstrap admin template, premium admin template html5, best bootstrap admin template, premium admin panel template, admin template"/>
+
+		<!-- Title -->
+		<title> Login </title>
+
+        <!-- Favicon -->
+		<link rel="icon" href="{% static 'assets/images/brand/favicon.ico' %}" type="image/x-icon"/>
+		<link rel="shortcut icon" type="image/x-icon" href="{% static 'assets/images/brand/favicon.ico' %}" />
+
+		<!--Bootstrap.min css-->
+		<link rel="stylesheet" href="{% static 'assets/plugins/bootstrap/css/bootstrap.min.css' %}">
+
+		<!-- Dashboard css -->
+		<link href="{% static 'assets/css/style.css' %}" rel="stylesheet" />
+		<link href="{% static 'assets/css/dark-style.css' %}" rel="stylesheet" />
+		<link href="{% static 'assets/css/skin-mode.css' %}" rel="stylesheet" />
+
+		<!-- Perfect scroll bar css-->
+		<link href="{% static 'assets/plugins/pscrollbar/perfect-scrollbar.css' %}" rel="stylesheet" />
+
+		<!-- Sidemenu css -->
+		<link rel="stylesheet" href="{% static 'assets/css/sidemenu-icon.css' %}">
+
+		<!--Daterangepicker css-->
+		<link href="{% static 'assets/plugins/bootstrap-daterangepicker/daterangepicker.css' %}" rel="stylesheet" />
+
+		<!-- Sidebar Accordions css -->
+		<link href="{% static 'assets/css/easy-responsive-tabs.css' %}" rel="stylesheet">
+
+		<!-- Rightsidebar css -->
+		<link href="{% static 'assets/plugins/sidebar/sidebar.css' %}" rel="stylesheet">
+
+		
+
+		<!---Icons css-->
+		<link href="{% static 'assets/plugins/icons/icons.css' %}" rel="stylesheet" />
+
+		<!-- Color-skins css -->
+		<link id="theme" rel="stylesheet" type="text/css" media="all" href="{% static 'assets/css/colors/color.css' %}" />
+		<link rel="stylesheet" href="{% static 'assets/css/demo-styles.css' %}"/>
+		<style>
+			.errorlist li{
+				color:white;
+			}
+			.errorlist .nonfield li{
+				color: brown;
+			}
+		</style>
+	</head>
+	<body class="bg-account">
+	    <!-- page -->
+		<div class="page h-100">
+			<!-- page-content -->
+			<div class="page-content">
+				<div class="container text-center text-dark">
+					<div class="row">
+						<div class="col-lg-4 d-block mx-auto">
+							<div class="row">
+								<div class="col-xl-12 col-md-12 col-md-12">
+									<div class="card">
+										<div class="card-body">
+											<div class="text-center mb-6">
+												<img src="assets/images/brand/logo.png" class="" alt="">
+											</div>
+											<h3>Login</h3>
+											<p class="text-muted">Sign In to your account</p>
+											
+											<form method="post">
+												{% csrf_token %}
+												<div class="input-group mb-3">
+													<span class="input-group-addon bg-white"><i class="fa fa-user"></i></span>
+													<input type="text" class="form-control" name="username" placeholder="Username">
+												</div>
+												<div class="input-group mb-4">
+													<span class="input-group-addon bg-white"><i class="fa fa-unlock-alt"></i></span>
+													<input type="password" class="form-control" name="password" placeholder="Password">
+												</div>
+												<div class="row">
+													<div class="col-12">
+														<button type="submit" class="btn btn-primary btn-block">Login</button>
+													</div>
+													<div class="col-12">
+														<a href="#" class="btn btn-link box-shadow-0 px-0">Forgot password?</a>
+														{% if form.errors %}
+															<p >
+																{{form.errors}}
+															</p>
+														{% endif %}
+													</div>
+												</div>
+											</form>
+
+											<div class="mt-6 btn-list">
+												<button type="button" class="btn btn-icon btn-facebook"><i class="fa fa-facebook"></i></button>
+												<button type="button" class="btn btn-icon btn-google"><i class="fa fa-google"></i></button>
+												<button type="button" class="btn btn-icon btn-twitter"><i class="fa fa-twitter"></i></button>
+												<button type="button" class="btn btn-icon btn-dribbble"><i class="fa fa-dribbble"></i></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<!-- page-content end -->
+
+
+		</div>
+		<!-- page End-->
+
+        <!-- Jquery js-->
+		<script src="assets/plugins/vendors/jquery.min.js"></script>
+
+		<!--Bootstrap.min js-->
+		<script src="assets/plugins/bootstrap/popper.min.js"></script>
+		<script src="assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+
+		<!--Jquery Sparkline js-->
+		<script src="assets/plugins/vendors/jquery.sparkline.min.js"></script>
+
+		<!-- Chart Circle js-->
+		<script src="assets/plugins/vendors/circle-progress.min.js"></script>
+
+		<!-- Sidebar Accordions js -->
+		<script src="assets/plugins/sidemenu-responsive-tabs/js/easyResponsiveTabs.js"></script>
+
+		<!--Moment js-->
+		<script src="assets/plugins/moment/moment.min.js"></script>
+
+		<!-- Daterangepicker js-->
+		<script src="assets/plugins/bootstrap-daterangepicker/daterangepicker.js"></script>
+
+		
+
+		<!-- Custom js-->
+		<script src="assets/js/custom.js"></script>
+
+	</body>
+
+<!-- Mirrored from laravel.spruko.com/sparic/ltr/login by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 31 Aug 2022 14:39:01 GMT -->
+</html>
