@@ -22,11 +22,12 @@ class BankStatementResource(resources.ModelResource):
 
     class Meta:
         model = BankStatement
-        import_id_fields = ('pk',)
+        # import_id_fields = ('date',)
         skip_unchanged = True
         report_skipped = False
-        fields = ('pk','date', 'customer', 'amount', 'type')
+        fields = ('date', 'customer', 'amount', 'type','audit_date')
         export_order = fields
+        import_id_fields =fields
         
 
 
@@ -34,14 +35,14 @@ class BankStatementResource(resources.ModelResource):
 class BankStatementIEAdmin(ImportExportModelAdmin):
     # list_display = BookAdmin._meta.get_all_field_names()
     listDisplay = [field.name for field in BankStatement._meta.get_fields()]
-    listDisplay.append("show_average")
+    # listDisplay.append("show_average")
     list_display = listDisplay
     list_filter = ("status", 'type', 'date')
     resource_class = BankStatementResource
 
-    def show_average(self, obj):
-        result = BankStatement.objects.get(pk=obj.pk)
-        return (result.amount/result.pk)
+    # def show_average(self, obj):
+    #     result = BankStatement.objects.get(pk=obj.pk)
+    #     return (result.amount/result.pk)
     
 
 class WithdrawalRequestResource(resources.ModelResource):
@@ -51,10 +52,10 @@ class WithdrawalRequestResource(resources.ModelResource):
 
     class Meta:
         model = WithdrawalRequest
-        import_id_fields = ('user_id',)
         skip_unchanged = True
         report_skipped = False
-        fields = ('user_id', 'amount', 'customer', 'bank_name', 'date', 'status')
+        fields = ('user_id', 'amount', 'customer', 'bank_name', 'date', 'audit_date')
+        import_id_fields = fields
 
 
 @admin.register(WithdrawalRequest)
@@ -111,10 +112,10 @@ class DepositRequestResource(resources.ModelResource):
 
     class Meta:
         model = DepositRequest
-        import_id_fields = ('user_id',)
         skip_unchanged = True
         report_skipped = False
-        fields = ('user_id', 'amount', 'customer', 'bank_name', 'date', 'status')
+        fields = ('user_id', 'amount', 'customer', 'bank_name', 'date', 'audit_date')
+        import_id_fields = fields
 
 @admin.register(DepositRequest)
 class DepositRequestEAdmin(ImportExportModelAdmin):

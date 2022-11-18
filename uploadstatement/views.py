@@ -117,11 +117,11 @@ def search(request):
     return render(request, "search_data.html", contenxt)
 
 
-def formatData(item,  class_object_name, filter_columns=None):    
+def formatData(item,  class_object_name, filter_columns=None, type=None):    
     filtered_data = class_object_name.objects.filter(amount__gte=(item.amount-3.0),amount__lte=(item.amount+3.0), audit_date=item.audit_date)
 
-    print('==================================date=============================')
-    
+    # print('==================================date=============================')
+    # if 'date_box' in filter_columns:
     if filter_columns.get('date_box'):
         audit_date = filter_columns.get('audit_date')
         date = datetime.strptime(audit_date, "%Y-%m-%d").date()
@@ -130,7 +130,7 @@ def formatData(item,  class_object_name, filter_columns=None):
         before_date = date - timedelta(days=int(before_day))
         after_date = date + timedelta(days=int(after_day))
         filtered_data = filtered_data.filter(date__gte=before_date, date__lte=after_date)
-    print('==================================date=============================')
+
 
     statuses = ["not matched", "parcialy matched", "fully matched", "only amount matched"] 
     status = statuses[0]
@@ -138,26 +138,33 @@ def formatData(item,  class_object_name, filter_columns=None):
     color = colors[0]
     matched_id = 0
     trueIndex = 0
-    splitted_names = str(item.customer).split(" ")
+    splitted_names = str(item.customer).strip().split(" ")
+
+    for find_dash in splitted_names:
+        if '-' in find_dash:
+            splitted_names.extend(find_dash.split('-'))
+        
 
     for i, nms in enumerate(splitted_names):
+        
         obj = filtered_data.filter(customer__icontains=nms)
         if obj:
             trueIndex +=1
-            if trueIndex >=1:
+            if trueIndex >=1 and trueIndex <len(statuses):
                 status = statuses[trueIndex]
                 color = colors[trueIndex]
                 matched_id = obj.first().user_id
         else:
-            if trueIndex > 0:
-                trueIndex -=1
-            if trueIndex > -1:
-                status = statuses[trueIndex]
-                color = colors[trueIndex]
+            if not type=="bank":
+                if trueIndex > 0 and  trueIndex<len(statuses):
+                    trueIndex -=1
+                if trueIndex > -1:
+                    status = statuses[trueIndex]
+                    color = colors[trueIndex]
         if i == len(splitted_names)-1 and (filtered_data.filter(amount=item.amount).count() == 1 and status == "not matched"):
             status = "Only Amount Matched"
             color = "lightblue"
-
+   
     return  {
                 "ID": item.user_id, 
                 "amount": item.amount, 
@@ -180,8 +187,8 @@ def match(obj):
     auditFilterWithDate = auditObj.objects.filter(audit_date=audit_date)
     bankFilterWithDate = BankStatement.objects.filter(audit_date=audit_date)
 
-    bankStatementData = list(map(lambda x: formatData(x, auditObj, obj) ,bankFilterWithDate)) 
-    auditRequestData = list(map(lambda x: formatData(x, BankStatement, obj),auditFilterWithDate)) 
+    bankStatementData = list(map(lambda objected: formatData(objected, auditObj, obj, 'bank') ,bankFilterWithDate)) 
+    auditRequestData = list(map(lambda objected: formatData(objected, BankStatement, obj, 'request'),auditFilterWithDate)) 
     
     return bankStatementData, auditRequestData
     

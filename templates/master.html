@@ -935,23 +935,51 @@
         <script>
             $(document).ready(function() {
 		       var oTable = $('#vertical-scrollable-datatable').dataTable( {
-		         "sScrollY": "200px",
-		         "bPaginate": true
-		       } );
+		        //  "sScrollY": "600px",
+		        //  "bPaginate": true,
+				lengthMenu: [200, 400, 700],
+				 select: {
+					style: 'single',
+					info: false,
+				selector: 'td:not(.status)'
+				},
+				scrollY:        "700px",
+				scrollX:        true,
+				scrollCollapse: true,
+				paging:         true,
+				orderCellsTop: true,
+				colReorder: {
+				realtime: false,
+				},
+				autoWidth: false,
+		       });
 		 
 		       $(window).on('resize', function () {
 		         oTable.fnAdjustColumnSizing();
-		       } );
+		       });
 
                var oTable2 = $('#vertical-scrollable-datatable2').dataTable( {
-		         "sScrollY": "200px",
-		         "bPaginate": true
+					lengthMenu: [200, 400, 700],
+					select: {
+						style: 'single',
+						info: false,
+					selector: 'td:not(.status)'
+					},
+					scrollY:        "700px",
+					scrollX:        true,
+					scrollCollapse: true,
+					paging:         true,
+					orderCellsTop: true,
+					colReorder: {
+					realtime: false,
+					},
+					autoWidth: false,
 		       } );
 		 
 		       $(window).on('resize', function () {
 		         oTable2.fnAdjustColumnSizing();
-		       } );
-		     } );
+		       });
+		     });
         </script>
 							{% block js %}
 							{% endblock %}

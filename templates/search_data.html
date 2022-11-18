@@ -45,32 +45,32 @@
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for=""> Amount </label> <br>
-                                       <label class="custom-switch">
-                                           <input type="checkbox" class="custom-switch-input" name="amount_box" value="True" {% if "amount_box" in posted_data %} checked="true" {% endif %}>
-                                           <span class="custom-switch-indicator"></span>
-                                           <span class="custom-switch-description">Match by amount</span>
-                                       </label>
-                                   </div>
+                                    <label class="custom-switch">
+                                        <input type="checkbox" class="custom-switch-input" name="amount_box" value="True" {% if "amount_box" in posted_data %} checked="true" {% endif %}>
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">Match by amount</span>
+                                    </label>
+                                </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for=""> Name </label> <br>
-                                       <label class="custom-switch">
-                                           <input type="checkbox" class="custom-switch-input" name="name_box" value="True" {% if "name_box" in posted_data %} checked="true" {% endif %}>
-                                           <span class="custom-switch-indicator"></span>
-                                           <span class="custom-switch-description">Match by name</span>
-                                       </label>
-                                   </div>
+                                    <label class="custom-switch">
+                                        <input type="checkbox" class="custom-switch-input" name="name_box" value="True" {% if "name_box" in posted_data %} checked="true" {% endif %}>
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">Match by name</span>
+                                    </label>
+                                </div>
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <label for=""> Date </label> <br>
-                                       <label class="custom-switch">
-                                           <input type="checkbox" class="custom-switch-input" id="date_box" name="date_box" value="True" {% if "date_box" in posted_data %} checked="true" {% endif %}>
-                                           <span class="custom-switch-indicator"></span>
-                                           <span class="custom-switch-description">Match by date</span>
-                                       </label>
-                                   </div>                                 
+                                    <label class="custom-switch">
+                                        <input type="checkbox" class="custom-switch-input" id="date_box" name="date_box" value="True" {% if "date_box" in posted_data %} checked="true" {% endif %}>
+                                        <span class="custom-switch-indicator"></span>
+                                        <span class="custom-switch-description">Match by date</span>
+                                    </label>
+                                </div>                                 
                                 </div>                                
                             </div>
                             <div class="row my-4" id="audit_date"  {% if "date_box" in posted_data %} style="display: flex;" {% else %} style="display: none;"  {% endif %}>
@@ -109,7 +109,7 @@
                         <hr>
                         <div class="col-12">
                             <input class="btn btn-primary" type="submit">
-                             
+                            
                         </div>
                     </div>
                 </div>
@@ -120,6 +120,8 @@
 
 
     </div>
+</div>
+<div class="row">
     <div class="col-md-6">
         <div class="card">
             <div class="card-header pb-0">
@@ -172,7 +174,7 @@
                                 <th>customar</th> 
                                 <!-- <th>Status</th> -->
                                 <th>Date</th> 
-                             </tr>
+                            </tr>
                         </thead>
                         <tbody>
                             {% for bankData in auditRequestData %}
