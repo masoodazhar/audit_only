@@ -22,10 +22,11 @@ class BankStatementResource(resources.ModelResource):
 
     class Meta:
         model = BankStatement
-        import_id_fields = ('user_id',)
+        import_id_fields = ('pk',)
         skip_unchanged = True
         report_skipped = False
-        fields = ('user_id', 'amount', 'customer', 'bank_name', 'date', 'type', 'comment')
+        fields = ('pk','date', 'customer', 'amount', 'type')
+        export_order = fields
         
 
 

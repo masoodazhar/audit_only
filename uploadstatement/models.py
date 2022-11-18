@@ -14,12 +14,12 @@ status = [
 
 
 class BankStatement(models.Model):
-    user_id = models.IntegerField()
+    user_id = models.IntegerField(blank=True, null=True)
     amount = models.FloatField()
     customer = models.CharField(max_length=255)
-    bank_name = models.CharField(max_length=30)
+    bank_name = models.CharField(max_length=30, blank=True, null=True, default='-')
     date = models.DateField()
-    status = models.CharField(max_length=20, default="", blank=True, choices=status)
+    status = models.CharField(max_length=20, default="", blank=True, null=True, choices=status)
     type = models.CharField(max_length = 10, choices=[("cr", "Credited"), ("dr","Debited")])
     comment = models.TextField()
     audit_date = models.DateField(default=datetime.now)
