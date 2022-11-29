@@ -191,5 +191,42 @@ def match(obj):
     auditRequestData = list(map(lambda objected: formatData(objected, BankStatement, obj, 'request'),auditFilterWithDate)) 
     
     return bankStatementData, auditRequestData
+
+
+
+def convert_bank_statement(request):
+    from datetime import datetime
+    response = HttpResponse(
+        content_type='text/csv',
+        headers={'Content-Disposition': f'attachment; filename="converted-{datetime.now()}-bank-statement.csv"'},
+    )
+    if request.method == "POST":
+        excel_file = request.FILES["bank_statement"]
+        import pandas as pd 
+        
+        import csv
+        df=pd.read_excel(excel_file)
+        df1=df.fillna (0)
+        df2=df1[df1['cr']!=0]
+        df2=df2.drop(['dr'], axis=1)
+        df2['type']='cr'
+        df3=df1[df1['dr']!=0]
+        df3=df3.drop(['cr'], axis=1)
+        df3['type']='dr'
+        df3=df3.rename(columns={'dr':'cr'})
+        df4=pd.concat([df2,df3])
+        df4['audit_date'] = datetime.now().strftime("%Y-%m-%d")
+        # data = df4.to_dict()
+        listOfDFRows = df4.to_numpy().tolist()
+        writer = csv.writer(response)
+        writer.writerow(['date', 'customer', 'amount','type','audit_date'])
+        for row in listOfDFRows:
+            date = str(row[0]).split(' ')[0]
+            row[0] = date
+            
+            writer.writerow(row)
+        return response
+        
+    return render(request, 'convert_bank_statement.html')
     
 

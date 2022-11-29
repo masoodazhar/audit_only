@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+   
+</body>
+</html>
+
+
+
+{% extends 'master.html' %}
+{% load static %}
+{% block body %}
+
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h1> Work in progress </h1>
+            </div>
+            <div class="card-body">
+                <form action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="form-group">
+                                <label for="">Select File</label>
+                                <input type="file" name="bank_statement" class="form-control">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="">&nbsp;</label> <br>
+                            <input type="submit" value="convert" class="btn btn-outline-success">
+                        </div>
+                    </div>
+                    
+                </form>
+            </div>
+           
+        </div>
+    </div>
+  
+</div>
+
+{% endblock %}
