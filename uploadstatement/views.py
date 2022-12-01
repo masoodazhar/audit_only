@@ -215,6 +215,7 @@ def convert_bank_statement(request):
         df3['type']='dr'
         df3=df3.rename(columns={'dr':'cr'})
         df4=pd.concat([df2,df3])
+        df4['date'] = df4['date'].dt.strftime("%Y-%d-%m")
         df4['audit_date'] = datetime.now().strftime("%Y-%m-%d")
         # data = df4.to_dict()
         listOfDFRows = df4.to_numpy().tolist()
