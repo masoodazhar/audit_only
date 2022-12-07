@@ -5,7 +5,7 @@ from django.contrib import messages
 import logging
 from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
-
+import re
 from uploadstatement.models import BankStatement, DepositRequest, WithdrawalRequest
 
 @login_required
@@ -82,6 +82,58 @@ def uploadstatement(request):
             print("========================ERROR=========================")
     
 
+# ==================================================================
+
+ONLY_ONE_AMOUNT_DATA = []
+
+FULL_NAME_AMOUNT_DATA = []
+
+NOT_MATCHED_DATA = []
+
+ONLY_AMOUNT_DATA = []
+
+
+index = 0
+def find_entire_item(data, key, allowed):
+        return list(filter(lambda x: key in x and x[key] in allowed, data))
+
+def match_combination(data_set, validate_data):
+     for bank in data_set:
+          matched = find_entire_item(validate_data, 'amount', (bank.get('amount'),))
+          if len(matched):
+               user_id = matched[0].get('user_id')
+               bank['user_id'] = user_id
+               ONLY_AMOUNT_DATA.append(bank)
+          else:
+               NOT_MATCHED_DATA.append(bank)
+          
+     status = [NOT_MATCHED_DATA, ONLY_ONE_AMOUNT_DATA, FULL_NAME_AMOUNT_DATA]
+
+     for only_amount_mahched in ONLY_AMOUNT_DATA:     
+          name = str(only_amount_mahched.get('customer')).lower()
+          name_cleaned = re.split('[-()]|a/c|from|to', name)
+          splitted_names = ''
+          if len(name_cleaned)>1:
+               splitted_names = str(name_cleaned[1].strip()).split(" ")
+
+          the_matched_item = []
+          user_id = only_amount_mahched.get('user_id')
+          the_matched_item = find_entire_item(validate_data, 'user_id', (user_id,))
+          
+          if the_matched_item:
+               required_names = str(the_matched_item[0].get('customer')).lower().split(' ')
+
+               if type(splitted_names) == list:
+                    index = 0
+                    for names in splitted_names:
+                         if names in required_names:
+                              index +=1
+                    status[index].append(only_amount_mahched)
+        
+
+
+# ==================================================================
+
 
 suditTypes = ["Withdrawal Requests", "Deposit Requests"]
 
@@ -90,9 +142,6 @@ def search(request):
     if "GET" == request.method:
         return render(request, "search_data.html")
 
-    print('=================================================')
-    print(request.POST)
-    print('=================================================')
 
     searchFields = request.POST
     audit_date = searchFields.get('searchDate')
@@ -104,11 +153,22 @@ def search(request):
         return HttpResponseRedirect(reverse("search"))
 
     auditData = auditObj.objects.filter(audit_date=audit_date)
-    bankStatementData, auditRequestData = match(request.POST)
+    # bankStatementData, auditRequestData = match(request.POST)
+
+    auditObj = WithdrawalRequest if auditType == '0' else DepositRequest
+
+    auditFilterWithDate = auditObj.objects.filter(audit_date=audit_date)
+    bankFilterWithDate = BankStatement.objects.filter(audit_date=audit_date)
+
+    auditFilterWithDate_converted = list(auditFilterWithDate.values())
+    bankFilterWithDate_converted = list(bankFilterWithDate.values())
     
+    match_combination(bankFilterWithDate_converted, auditFilterWithDate_converted)    
+
     contenxt = {
-        "bankStatementData": bankStatementData,
-        "auditRequestData": auditRequestData,
+        "bankStatementData": [],
+        "auditRequestData": [],
+        
         "audit_date": audit_date,
         "auditType": auditType,
         "auditTypeHeading": suditTypes[int(auditType)],
