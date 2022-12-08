@@ -63,6 +63,7 @@
 
 		<!-- Color-skins css -->
 		<link id="theme" rel="stylesheet" type="text/css" media="all" href="{% static 'assets/css/colors/color.css' %}" />
+		<link id="theme" rel="stylesheet" type="text/css" media="all" href="{% static 'assets/plugins/tabs/tabs-style.css' %}" />
         
         <!-- Data tables -->
         <link href="{% static 'assets/plugins/datatable/dataTables.bootstrap4.min.css' %}" rel="stylesheet" />
@@ -932,6 +933,8 @@
 		<script src="{% static 'assets/plugins/datatable/js/dataTables.buttons.min.js' %}"></script>
 		<script src="{% static 'assets/plugins/datatable/dataTables.responsive.min.js' %}"></script>
 
+		<script src="{% static 'assets/plugins/tabs/jquery.multipurpose_tabcontent.js' %}"></script>
+		<script src="{% static 'assets/plugins/tabs/tabs.js' %}"></script>
 		<!-- Switcher js -->
 		<script src="{% static 'assets/switcher/js/switcher.js' %}"></script>
 
@@ -940,7 +943,7 @@
 		<script src="{% static 'assets/js/custom.js' %}"></script>
         <script>
             $(document).ready(function() {
-		       var oTable = $('#vertical-scrollable-datatable').dataTable( {
+		       var oTable = $('.datatables').dataTable( {
 		        //  "sScrollY": "600px",
 		        //  "bPaginate": true,
 				lengthMenu: [200, 400, 700],
@@ -985,6 +988,7 @@
 		       $(window).on('resize', function () {
 		         oTable2.fnAdjustColumnSizing();
 		       });
+			   
 		     });
         </script>
 							{% block js %}

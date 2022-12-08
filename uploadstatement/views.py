@@ -8,8 +8,8 @@ from django.contrib.auth.decorators import login_required
 import re
 from uploadstatement.models import BankStatement, DepositRequest, WithdrawalRequest
 
-@login_required
-def index(request):
+# @login_required
+def dashboard_audit(request):
     return render(request, "search_data.html")
 
 
@@ -84,54 +84,34 @@ def uploadstatement(request):
 
 # ==================================================================
 
-ONLY_ONE_AMOUNT_DATA = []
-
 FULL_NAME_AMOUNT_DATA = []
-
 NOT_MATCHED_DATA = []
 
-ONLY_AMOUNT_DATA = []
-
-
 index = 0
-def find_entire_item(data, key, allowed):
-        return list(filter(lambda x: key in x and x[key] in allowed, data))
+def find_entire_item(data, customer, amount):
+        return list(filter(lambda x: customer == x.get('customer') and x.get('amount') == amount, data))
 
-def match_combination(data_set, validate_data):
-     for bank in data_set:
-          matched = find_entire_item(validate_data, 'amount', (bank.get('amount'),))
-          if len(matched):
-               user_id = matched[0].get('user_id')
-               bank['user_id'] = user_id
-               ONLY_AMOUNT_DATA.append(bank)
-          else:
-               NOT_MATCHED_DATA.append(bank)
+def filter_maches(data_set, validate_data):
+     for i in validate_data:
+          i['customer'] = ' '.join(sorted(str(i['customer']).lower().strip().split()))
+
+     for bank_obj in data_set:     
+          name = str(bank_obj.get('customer')).lower().replace('asaan account','').replace('asaan ac','').replace('()', '').replace('asaanaccount', '')
+          name_cleaned = re.split('-|a/c|from|to|pk|/', name)
           
-     status = [NOT_MATCHED_DATA, ONLY_ONE_AMOUNT_DATA, FULL_NAME_AMOUNT_DATA]
-
-     for only_amount_mahched in ONLY_AMOUNT_DATA:     
-          name = str(only_amount_mahched.get('customer')).lower()
-          name_cleaned = re.split('[-()]|a/c|from|to', name)
           splitted_names = ''
           if len(name_cleaned)>1:
-               splitted_names = str(name_cleaned[1].strip()).split(" ")
+               splitted_names = str(name_cleaned[1]).strip().split(" ")
 
-          the_matched_item = []
-          user_id = only_amount_mahched.get('user_id')
-          the_matched_item = find_entire_item(validate_data, 'user_id', (user_id,))
-          
-          if the_matched_item:
-               required_names = str(the_matched_item[0].get('customer')).lower().split(' ')
+          splitted_names_sorted = ' '.join(sorted(splitted_names))
 
-               if type(splitted_names) == list:
-                    index = 0
-                    for names in splitted_names:
-                         if names in required_names:
-                              index +=1
-                    status[index].append(only_amount_mahched)
-        
-
-
+          matched = find_entire_item(validate_data, splitted_names_sorted, bank_obj.get('amount'))
+          if len(matched):
+               user_id = matched[0].get('user_id')
+               bank_obj['user_id'] = user_id
+               FULL_NAME_AMOUNT_DATA.append(bank_obj)
+          else:
+               NOT_MATCHED_DATA.append(bank_obj)
 # ==================================================================
 
 
@@ -163,12 +143,21 @@ def search(request):
     auditFilterWithDate_converted = list(auditFilterWithDate.values())
     bankFilterWithDate_converted = list(bankFilterWithDate.values())
     
-    match_combination(bankFilterWithDate_converted, auditFilterWithDate_converted)    
+    filter_maches(bankFilterWithDate_converted, auditFilterWithDate_converted)    
+    
+    # print(f"Bank Total: {len(bankFilterWithDate_converted)}, Audit Total: {len(auditFilterWithDate_converted)},\
+    #  ONLY_ONE_AMOUNT_DATA: {len(ONLY_ONE_AMOUNT_DATA)}, FULL_NAME_AMOUNT_DATA: {len(FULL_NAME_AMOUNT_DATA)}, \
+    #  NOT_MATCHED_DATA: {len(NOT_MATCHED_DATA)}, ONLY_AMOUNT_DATA: {len(ONLY_AMOUNT_DATA)}\
+    #  ")
+
+    print(auditFilterWithDate_converted)
+
 
     contenxt = {
         "bankStatementData": [],
         "auditRequestData": [],
-        
+        "FULL_NAME_AMOUNT_DATA": FULL_NAME_AMOUNT_DATA,
+        "NOT_MATCHED_DATA": NOT_MATCHED_DATA,
         "audit_date": audit_date,
         "auditType": auditType,
         "auditTypeHeading": suditTypes[int(auditType)],
